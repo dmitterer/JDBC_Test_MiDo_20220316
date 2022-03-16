@@ -123,7 +123,26 @@ public class ZugangsdatenRepoImpl implements ZugangsdatenRepository {
 
     @Override
     public List<Zugangsdaten> getAllWithUrlContaining(String urlpart) {
-        return null;
+
+        EigeneAsserts.notNull(urlpart);
+        try {
+            String sql = "SELECT * FROM `zugangsdaten` WHERE `url` LIKE (?)";
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setString(1, "%" + urlpart + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ArrayList<Zugangsdaten> zugangsdatenArrayList = new ArrayList<>();
+            while (resultSet.next()){
+                zugangsdatenArrayList.add(new Zugangsdaten(
+                        resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4)
+                     ));
+            }
+            return zugangsdatenArrayList;
+        }catch (SQLException sqlException){
+            throw new DatenbankException(sqlException.getMessage());
+        }
     }
 }
 
